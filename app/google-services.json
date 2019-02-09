@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "144785839916",
+    "firebase_url": "https://medicalorganization-7b35a.firebaseio.com",
+    "project_id": "medicalorganization-7b35a",
+    "storage_bucket": "medicalorganization-7b35a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:144785839916:android:5afe3401a774aa21",
+        "android_client_info": {
+          "package_name": "com.example.medicalorganization"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "144785839916-9jnl8tj8ocv4rsajvdpmi219oepk5bcv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.medicalorganization",
+            "certificate_hash": "2472020942345a1be887a0e4c8e354d9c981424f"
+          }
+        },
+        {
+          "client_id": "144785839916-jv35g7enl88in9l4m4pfcr8u4llc1g7f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzpQWa1PaPrI8BKGdvrGS57b-GhUvEa6k"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "144785839916-jv35g7enl88in9l4m4pfcr8u4llc1g7f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
