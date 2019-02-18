@@ -8,6 +8,11 @@
     android:background="@color/graylight"
     android:orientation="vertical">
     
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:background="@color/startblue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></android.support.v7.widget.Toolbar>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="405dp">
@@ -149,7 +154,14 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="20dp"
                 android:text="Phone"/>
+
         </LinearLayout>
+        <TextView
+            android:id="@+id/textViewVerified"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Verified"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"/>
     </LinearLayout>
 
 </LinearLayout>
