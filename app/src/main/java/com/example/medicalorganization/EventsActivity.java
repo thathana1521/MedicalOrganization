@@ -9,18 +9,29 @@ import android.widget.Toast;
 
 import com.example.medicalorganization.Models.Event;
 import com.example.medicalorganization.TimePickerFragment;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Date;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EventsActivity extends AppCompatActivity implements TimePickerFragment.OnTimePickedListener {
 
     public Date dateTime = null;
     public Date startTime = null, endTime = null;
+    private FirebaseDatabase mFireDatabase;
+    private DatabaseReference mEventsDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_events);
+
+        mFireDatabase = FirebaseDatabase.getInstance();
+        mEventsDatabaseReference = mFireDatabase.getReference().child("events");
     }
 
 
@@ -34,6 +45,7 @@ public class EventsActivity extends AppCompatActivity implements TimePickerFragm
         String year = intent.getStringExtra("year");
         String month = intent.getStringExtra("month");
         String day = intent.getStringExtra("dayOfMonth");
+        String doctorName = intent.getStringExtra("doctorName");
 
         Date date = new Date(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day));
 
@@ -45,13 +57,13 @@ public class EventsActivity extends AppCompatActivity implements TimePickerFragm
         } else {
             Toast.makeText(getApplicationContext(), "Start Time or End Time is not set!", Toast.LENGTH_LONG).show();
         }
-        Event event = new Event(date, startTime, endTime, false );
+        Event event = new Event(date, startTime, endTime, doctorName, "patientname", false );
         if (event==null){
             Toast.makeText(getApplicationContext(),"Something went wrong with the creation of event.", Toast.LENGTH_LONG).show();
         }
         else {
             Toast.makeText(getApplicationContext(),"Event Created with date:"+event.date.toString()+" startTime: "+event.startTime.toString()+" endTime: "+event.endTime.toString(), Toast.LENGTH_LONG).show();
-
+            addEventToDatabase(event);
         }
     }
 
@@ -66,6 +78,10 @@ public class EventsActivity extends AppCompatActivity implements TimePickerFragm
         else {
             endTime = dateTime;
         }
+    }
+
+    public void addEventToDatabase(Event event){
+        mEventsDatabaseReference.push().setValue(event);
     }
 }
 

@@ -32,6 +32,11 @@ public class CalendarActivity extends AppCompatActivity {
                 intent.putExtra("month", String.valueOf(month));
                 intent.putExtra("dayOfMonth", String.valueOf(dayOfMonth));
 
+                Intent profileIntent = getIntent();
+                String doctorName = profileIntent.getStringExtra("doctorName");
+
+                intent.putExtra("doctorName", doctorName);
+
                 startActivity(intent);
             }
         });

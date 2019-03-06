@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +31,7 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseDatabase mFireDatabase;
     private DatabaseReference mReference;
     private TextView name, identity, rantevou, mail, verified;
+    private Button btnCreateEvent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +41,7 @@ public class ProfileActivity extends AppCompatActivity {
         identity = (TextView)findViewById(R.id.identityTextView);
         mail = (TextView)findViewById(R.id.mailTextView);
         verified = (TextView) findViewById(R.id.textViewVerified);
-
+        btnCreateEvent = (Button)findViewById(R.id.btnCreateEvent);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mAuth = FirebaseAuth.getInstance();
@@ -83,6 +85,33 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void createEvent(View view){
+        final String email = mAuth.getCurrentUser().getEmail();
+        mReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    Users user = data.getValue(Users.class);
+                    //Toast.makeText(getApplicationContext(),"Identity = "+user.Identity,Toast.LENGTH_LONG).show();
+                    //Ean o xrhsths uparxei sti vasi kai einai giatros tote anoixe to calendar view gia na ftiaxei diathesimo rantevou
+                    if (user.Email.equals(email) && user.Identity.equals("Doctor")) {
+                        Intent intent = new Intent(getApplicationContext(), CalendarActivity.class);
+                        String doctorName = user.Name + " " + user.Surname;
+                        intent.putExtra("doctorName", doctorName);
+                        startActivity(intent);
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(),"Kati phge strava",Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
