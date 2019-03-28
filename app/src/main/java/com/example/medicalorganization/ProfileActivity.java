@@ -30,8 +30,8 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFireDatabase;
     private DatabaseReference mReference;
-    private TextView name, identity, rantevou, mail, verified;
-    private Button btnCreateEvent;
+    private TextView name, identity, rantevou, mail, verifiedEmail;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,9 +40,9 @@ public class ProfileActivity extends AppCompatActivity {
         name = (TextView)findViewById(R.id.nameTextView);
         identity = (TextView)findViewById(R.id.identityTextView);
         mail = (TextView)findViewById(R.id.mailTextView);
-        verified = (TextView) findViewById(R.id.textViewVerified);
-        btnCreateEvent = (Button)findViewById(R.id.btnCreateEvent);
+        verifiedEmail = (TextView) findViewById(R.id.verifiedEmail);
         Toolbar toolbar = findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
         mAuth = FirebaseAuth.getInstance();
         mFireDatabase = FirebaseDatabase.getInstance();
@@ -64,13 +64,14 @@ public class ProfileActivity extends AppCompatActivity {
                         identity.setText(user.Identity);
                         mail.setText(user.Email);
                     }
+
                     //Check if user is verified email address, if not click to verify
                     if(mAuth.getCurrentUser().isEmailVerified()){
-                        verified.setText("Email Verified");
+                        verifiedEmail.setText("Email Verified");
                     }
                     else {
-                        verified.setText("Email not Verified");
-                        verified.setOnClickListener(new View.OnClickListener() {
+                        verifiedEmail.setText("Email not Verified. Click to send Verification Email");
+                        verifiedEmail.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 mAuth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -106,9 +107,6 @@ public class ProfileActivity extends AppCompatActivity {
                         String doctorName = user.Name + " " + user.Surname;
                         intent.putExtra("doctorName", doctorName);
                         startActivity(intent);
-                    }
-                    else {
-                        Toast.makeText(getApplicationContext(),"Kati phge strava",Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -152,6 +150,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(this,LoginActivity.class));
+        startActivity(new Intent(this,UserActivity.class));
     }
 }

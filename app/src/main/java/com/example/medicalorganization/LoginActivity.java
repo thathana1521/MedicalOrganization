@@ -56,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     //you have successfully logged
                     finish();
-                    Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), UserActivity.class);
                     //clear all activities on the top of the stack, when back button is pressed
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);

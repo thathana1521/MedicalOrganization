@@ -20,7 +20,6 @@ public class CalendarActivity extends AppCompatActivity {
 
         calendarView = (CalendarView)findViewById(R.id.calendarView);
         myDate = (TextView)findViewById(R.id.myDate);
-        button = (Button)findViewById(R.id.button);
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override

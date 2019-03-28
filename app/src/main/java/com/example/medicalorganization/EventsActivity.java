@@ -57,7 +57,7 @@ public class EventsActivity extends AppCompatActivity implements TimePickerFragm
         } else {
             Toast.makeText(getApplicationContext(), "Start Time or End Time is not set!", Toast.LENGTH_LONG).show();
         }
-        Event event = new Event(date, startTime, endTime, doctorName, "patientname", false );
+        Event event = new Event(date, startTime, endTime, doctorName, "No Patient choosed this event", false );
         if (event==null){
             Toast.makeText(getApplicationContext(),"Something went wrong with the creation of event.", Toast.LENGTH_LONG).show();
         }
