@@ -10,7 +10,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.medicalorganization.Models.Users;
+import com.example.medicalorganization.Models.Doctor;
+import com.example.medicalorganization.Models.Patient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -85,35 +86,60 @@ public class RegisterActivity extends AppCompatActivity {
                         if(task.isSuccessful()){
                             //we will store the additional fields in firebase database
                             if(identityId == 1){
-                                str_identity="Doctor";
-                            }
-                            else {
-                                str_identity="Patient";
-                            }
-                            Users user = new Users(str_name, str_surname, str_age, str_email, str_identity);
-                            FirebaseDatabase.getInstance().getReference("Users")
-                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    progressBar.setVisibility(View.GONE);
-                                    if(task.isSuccessful()){
-                                        finish();
-                                        Toast.makeText(RegisterActivity.this, "User registered Successfully", Toast.LENGTH_LONG).show();
-                                        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-                                        //clear all activities on the top of the stack, when back button is pressed
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                        startActivity(intent);
-                                    }
-                                    else {
-                                        if (task.getException() instanceof FirebaseAuthUserCollisionException) {
-                                            Toast.makeText(RegisterActivity.this, "You are already registered", Toast.LENGTH_LONG).show();
+                                //if Doctor
+                                Doctor doctor = new Doctor(str_name, str_surname, str_age, str_email);
+                                FirebaseDatabase.getInstance().getReference("Doctors")
+                                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(doctor).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        progressBar.setVisibility(View.GONE);
+                                        if(task.isSuccessful()){
+                                            finish();
+                                            Toast.makeText(RegisterActivity.this, "Doctor registered Successfully", Toast.LENGTH_LONG).show();
+                                            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                                            //clear all activities on the top of the stack, when back button is pressed
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                            startActivity(intent);
+                                        }
+                                        else {
+                                            if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                                                Toast.makeText(RegisterActivity.this, "You are already registered", Toast.LENGTH_LONG).show();
 
-                                        } else {
-                                            Toast.makeText(RegisterActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                            } else {
+                                                Toast.makeText(RegisterActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                            }
                                         }
                                     }
-                                }
-                            });
+                                });
+                            }
+                            else {
+                                //if Patient
+                                Patient patient = new Patient(str_name, str_surname, str_age, str_email);
+                                FirebaseDatabase.getInstance().getReference("Patients")
+                                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(patient).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        progressBar.setVisibility(View.GONE);
+                                        if(task.isSuccessful()){
+                                            finish();
+                                            Toast.makeText(RegisterActivity.this, "Patient registered Successfully", Toast.LENGTH_LONG).show();
+                                            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                                            //clear all activities on the top of the stack, when back button is pressed
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                            startActivity(intent);
+                                        }
+                                        else {
+                                            if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                                                Toast.makeText(RegisterActivity.this, "You are already registered", Toast.LENGTH_LONG).show();
+
+                                            } else {
+                                                Toast.makeText(RegisterActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+
 
                         }
                         else {

@@ -7,7 +7,14 @@
     tools:context=".UserActivity"
     android:orientation="vertical"
     android:padding="10dp"
-    android:background="@color/startblue">
+    android:background="@color/bg_register">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/startblue"></android.support.v7.widget.Toolbar>
+
     <LinearLayout
         android:clipToPadding="false"
         android:gravity="center"

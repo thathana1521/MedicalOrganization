@@ -14,7 +14,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.example.medicalorganization.Models.Users;
+import com.example.medicalorganization.Models.Doctor;
+
+import com.example.medicalorganization.Models.Patient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,8 +31,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFireDatabase;
-    private DatabaseReference mReference;
-    private TextView name, identity, rantevou, mail, verifiedEmail;
+    private DatabaseReference mDoctorsReference, mPatientReference;
+    private TextView name, identity, mail, verifiedEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,28 +43,66 @@ public class ProfileActivity extends AppCompatActivity {
         identity = (TextView)findViewById(R.id.identityTextView);
         mail = (TextView)findViewById(R.id.mailTextView);
         verifiedEmail = (TextView) findViewById(R.id.verifiedEmail);
-        Toolbar toolbar = findViewById(R.id.toolbar);
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         mAuth = FirebaseAuth.getInstance();
         mFireDatabase = FirebaseDatabase.getInstance();
-        mReference = mFireDatabase.getReference().child("Users");
-
+        mDoctorsReference = mFireDatabase.getReference().child("Doctors");
+        mPatientReference = mFireDatabase.getReference().child("Patients");
         loadUserInformation();
     }
 
     private void loadUserInformation() {
 
         final String email = mAuth.getCurrentUser().getEmail();
-        mReference.addValueEventListener(new ValueEventListener() {
+        mDoctorsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot data : dataSnapshot.getChildren()){
-                    Users user = data.getValue(Users.class);
-                    if(user.Email.equals(email)){
-                        name.setText(user.Name + " " + user.Surname);
-                        identity.setText(user.Identity);
-                        mail.setText(user.Email);
+                    Doctor doctor = data.getValue(Doctor.class);
+                    if(doctor.Email.equals(email)){
+                        name.setText(doctor.Name + " " + doctor.Surname);
+                        identity.setText("Doctor");
+                        mail.setText(doctor.Email);
+                    }
+
+                    //Check if user is verified email address, if not click to verify
+                    if(mAuth.getCurrentUser().isEmailVerified()){
+                        verifiedEmail.setText("Email Verified");
+                    }
+                    else {
+                        verifiedEmail.setText("Email not Verified. Click to send Verification Email");
+                        verifiedEmail.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mAuth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        Toast.makeText(ProfileActivity.this, "Verification email Sent", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        mPatientReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot data : dataSnapshot.getChildren()){
+                    Patient patient = data.getValue(Patient.class);
+                    if(patient.Email.equals(email)){
+                        name.setText(patient.Name + " " + patient.Surname);
+                        identity.setText("Patient");
+                        mail.setText(patient.Email);
                     }
 
                     //Check if user is verified email address, if not click to verify
@@ -95,16 +135,16 @@ public class ProfileActivity extends AppCompatActivity {
 
     public void createEvent(View view){
         final String email = mAuth.getCurrentUser().getEmail();
-        mReference.addValueEventListener(new ValueEventListener() {
+        mDoctorsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    Users user = data.getValue(Users.class);
+                    Doctor doctor = data.getValue(Doctor.class);
                     //Toast.makeText(getApplicationContext(),"Identity = "+user.Identity,Toast.LENGTH_LONG).show();
                     //Ean o xrhsths uparxei sti vasi kai einai giatros tote anoixe to calendar view gia na ftiaxei diathesimo rantevou
-                    if (user.Email.equals(email) && user.Identity.equals("Doctor")) {
+                    if (doctor.Email.equals(email)) {
                         Intent intent = new Intent(getApplicationContext(), CalendarActivity.class);
-                        String doctorName = user.Name + " " + user.Surname;
+                        String doctorName = doctor.Name + " " + doctor.Surname;
                         intent.putExtra("doctorName", doctorName);
                         startActivity(intent);
                     }

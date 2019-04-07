@@ -23,7 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 public class LoginActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mUsersDatabaseReference;
+    private DatabaseReference mDoctorsDatabaseReference, mPatientsDatabaseReference;
     private FirebaseAuth mAuth;
 
     private EditText email, password;
@@ -36,14 +36,14 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("users");
+        mDoctorsDatabaseReference = mFirebaseDatabase.getReference().child("Doctors");
+        mPatientsDatabaseReference = mFirebaseDatabase.getReference().child("Patients");
         mAuth = FirebaseAuth.getInstance();
         email =(EditText)findViewById(R.id.editText_email);
         password = (EditText)findViewById(R.id.editText_password);
         progressBar = (ProgressBar)findViewById(R.id.progressbar);
         progressBar.setVisibility(View.GONE);
 
-        mAuth = FirebaseAuth.getInstance();
     }
 
     public void OnLogin(View view) {
