@@ -31,10 +31,4 @@ public class AppointmentPatientActivity extends AppCompatActivity {
         tabLayout = (TabLayout)findViewById(R.id.main_tabs);
         tabLayout.setupWithViewPager(viewPager);
     }
-
-    public void chooseDoctor(View view) {
-    }
-
-    public void manageAppointments(View view) {
-    }
 }

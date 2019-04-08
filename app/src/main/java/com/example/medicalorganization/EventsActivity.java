@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.example.medicalorganization.Models.Event;
 import com.example.medicalorganization.TimePickerFragment;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
@@ -23,6 +24,7 @@ public class EventsActivity extends AppCompatActivity implements TimePickerFragm
     public Date dateTime = null;
     public Date startTime = null, endTime = null;
     private FirebaseDatabase mFireDatabase;
+    private FirebaseAuth mAuth;
     private DatabaseReference mEventsDatabaseReference;
 
     @Override
@@ -31,7 +33,9 @@ public class EventsActivity extends AppCompatActivity implements TimePickerFragm
         setContentView(R.layout.activity_events);
 
         mFireDatabase = FirebaseDatabase.getInstance();
-        mEventsDatabaseReference = mFireDatabase.getReference().child("events");
+        mAuth = FirebaseAuth.getInstance();
+        String currentDoctorId = mAuth.getCurrentUser().getUid();
+        mEventsDatabaseReference = mFireDatabase.getReference().child("Doctors").child(currentDoctorId).child("Events");
     }
 
 
