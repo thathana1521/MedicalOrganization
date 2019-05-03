@@ -19,6 +19,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -55,11 +57,79 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()){
                     progressBar.setVisibility(View.GONE);
                     //you have successfully logged
-                    finish();
-                    Intent intent = new Intent(getApplicationContext(), UserActivity.class);
-                    //clear all activities on the top of the stack, when back button is pressed
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
+                    final String currentUserId = mAuth.getCurrentUser().getUid();
+                    final String[] token = new String[1];
+                    //GET REGISTRATION TOKEN
+                    FirebaseInstanceId.getInstance().getInstanceId()
+                            .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                    if(task.isSuccessful()){
+                                        //get registration token
+                                        token[0] = task.getResult().getToken();
+                                    }
+                                    else{
+                                        Toast.makeText(getApplicationContext(),"Token not generated" + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            });
+
+                    //set the device token on database if doctor
+                    mDoctorsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.hasChild(currentUserId)){
+                                mDoctorsDatabaseReference.child(currentUserId).child("Device_Token")
+                                        .setValue(token[0])
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if(task.isSuccessful()){
+                                                    finish();
+                                                    Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+                                                    //clear all activities on the top of the stack, when back button is pressed
+                                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                    startActivity(intent);
+                                                }
+                                            }
+                                        });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    //set the device token on database if patient
+                    mPatientsDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.hasChild(currentUserId)){
+                                mPatientsDatabaseReference.child(currentUserId).child("device_token")
+                                        .setValue(token[0])
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if(task.isSuccessful()){
+                                                    finish();
+                                                    Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+                                                    //clear all activities on the top of the stack, when back button is pressed
+                                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                    startActivity(intent);
+                                                }
+                                            }
+                                        });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
                 }
                 else {
                     progressBar.setVisibility(View.GONE);
@@ -78,9 +148,7 @@ public class LoginActivity extends AppCompatActivity {
             finish();
             startActivity(new Intent(this, ProfileActivity.class));
         }
-        else {
 
-        }
     }
 
     public void OpenRegister(View view) {

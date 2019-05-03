@@ -18,11 +18,14 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText name, surname, age, password, email;
-    private String str_identity; //declared within on register method
+
     private ProgressBar progressBar;
     private CheckBox identity_doctor, identity_patient;
     public int identityId;
@@ -79,15 +82,35 @@ public class RegisterActivity extends AppCompatActivity {
         final String str_email =email.getText().toString().trim();
         final String str_password = password.getText().toString().trim();
 
+        final String token[] = new String[1];
+
+        //GET REGISTRATION TOKEN
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if(task.isSuccessful()){
+                            //get registration token
+                            token[0] = task.getResult().getToken();
+                        }
+                        else{
+                            Toast.makeText(getApplicationContext(),"Token not generated" + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
         mAuth.createUserWithEmailAndPassword(str_email, str_password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
+                            final String currentUserId = mAuth.getCurrentUser().getUid();
                             //we will store the additional fields in firebase database
                             if(identityId == 1){
+
                                 //if Doctor
-                                Doctor doctor = new Doctor(str_name, str_surname, str_age, str_email);
+
+                                Doctor doctor = new Doctor(str_name, str_surname, str_age, str_email, token[0]);
                                 FirebaseDatabase.getInstance().getReference("Doctors")
                                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(doctor).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
@@ -114,7 +137,7 @@ public class RegisterActivity extends AppCompatActivity {
                             }
                             else {
                                 //if Patient
-                                Patient patient = new Patient(str_name, str_surname, str_age, str_email);
+                                Patient patient = new Patient(str_name, str_surname, str_age, str_email, token[0]);
                                 FirebaseDatabase.getInstance().getReference("Patients")
                                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(patient).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
@@ -138,6 +161,7 @@ public class RegisterActivity extends AppCompatActivity {
                                         }
                                     }
                                 });
+
                             }
 
 

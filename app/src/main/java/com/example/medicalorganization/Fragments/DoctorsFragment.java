@@ -70,6 +70,7 @@ public class DoctorsFragment extends Fragment {
                         //jump to available events of doctor. passing doctorId to the AvailableEventsActivity
                         Intent intent = new Intent(getActivity(), AvailableEvents.class);
                         String doctorId = getRef(position).getKey();
+                        intent.putExtra("doctorToken", model.Device_Token);
                         intent.putExtra("doctorId", doctorId);
                         startActivity(intent);
                     }
