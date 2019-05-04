@@ -1,5 +1,8 @@
 package com.example.medicalorganization;
 
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,6 +11,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,12 +32,15 @@ import java.util.List;
 public class NotificationsActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private List<NotificationPanel> list = new ArrayList<>();
-    private RecyclerView.Adapter adapter;
 
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mAuth;
     private DatabaseReference DoctorsRef, NotifRef;
+
+    public Dialog dialog;
+    public Button acceptButton, rejectButton;
+    public ImageView closePopup;
+    public TextView descriptionTextView;
 
 
     @Override
@@ -40,9 +48,11 @@ public class NotificationsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notifications);
 
+        dialog = new Dialog(this);
+
+
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        Toast.makeText(getApplicationContext(), mAuth.getCurrentUser().getUid(), Toast.LENGTH_LONG).show();
         DoctorsRef = mFirebaseDatabase.getInstance().getReference().child("Doctors").child(mAuth.getCurrentUser().getUid());
         NotifRef = mFirebaseDatabase.getInstance().getReference().child("Doctors").child(mAuth.getCurrentUser().getUid()).child("Notifications");
         recyclerView = (RecyclerView)findViewById(R.id.recycler_view);
@@ -55,7 +65,6 @@ public class NotificationsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                    Toast.makeText(getApplicationContext(), mAuth.getCurrentUser().getUid(), Toast.LENGTH_LONG).show();
                     if (dataSnapshot.hasChild("Notifications")) {
                         FirebaseRecyclerOptions options =
                                 new FirebaseRecyclerOptions.Builder<NotificationPanel>()
@@ -65,11 +74,17 @@ public class NotificationsActivity extends AppCompatActivity {
                         FirebaseRecyclerAdapter<NotificationPanel, NotifViewHolder> adapter
                                 = new FirebaseRecyclerAdapter<NotificationPanel, NotifViewHolder>(options) {
                             @Override
-                            protected void onBindViewHolder(@NonNull NotifViewHolder holder, int position, @NonNull NotificationPanel model) {
+                            protected void onBindViewHolder(@NonNull NotifViewHolder holder, int position, @NonNull final NotificationPanel model) {
                                 String patientName = model.patientName;
                                 String date = model.event.date.toString();
 
                                 holder.setDescription(patientName + " has requested an appointment on " + date);
+                                holder.mView.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        ShowPopup(model);
+                                    }
+                                });
                             }
 
                             @NonNull
@@ -112,6 +127,41 @@ public class NotificationsActivity extends AppCompatActivity {
             description = (TextView)mView.findViewById(R.id.appointment);
             description.setText(disc);
         }
+    }
+
+    private void ShowPopup(final NotificationPanel panel){
+        dialog.setContentView(R.layout.popup_appointment);
+        closePopup = (ImageView) dialog.findViewById(R.id.closeImageView);
+        acceptButton = (Button) dialog.findViewById(R.id.accept_button);
+        rejectButton = (Button) dialog.findViewById(R.id.reject_button);
+        descriptionTextView = (TextView) dialog.findViewById(R.id.patient_description);
+
+        descriptionTextView.setText(panel.patientName + " requested the Appointment");
+
+        closePopup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        acceptButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //send notification to patient that the appointment accepted
+            }
+        });
+
+        rejectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //send notification to patient that the appointment rejected
+            }
+        });
+
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
+
     }
 
 }

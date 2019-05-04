@@ -35,4 +35,17 @@
     <color name="primaryDark">#2f2f2f</color>
     <color name="accent">#52b7f8</color>
     <color name="backgroundFragment">#2b2b2b</color>
+
+    //Alert Dialog Colors
+    <color name="alertPrimary">#848cb7</color>
+    <color name="alertPrimaryDark">#6d749f</color>
+    <color name="alertColorRed">#ff3943</color>
+    <color name="alertColorRedDark">#801b20</color>
+    <color name="alertColorGreenLight">#abffc0</color>
+    <color name="alertColorGreen">#247b37</color>
+    <color name="alertColorGreen1">#3eb959</color>
+    <color name="alertColorWhite">#ffffff</color>
+    <color name="alertColorAccent">#FF4081</color>
+
+
 </resources>
