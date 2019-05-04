@@ -40,9 +40,9 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        name = (TextView)findViewById(R.id.nameTextView);
-        identity = (TextView)findViewById(R.id.identityTextView);
-        mail = (TextView)findViewById(R.id.mailTextView);
+        name = (TextView) findViewById(R.id.nameTextView);
+        identity = (TextView) findViewById(R.id.identityTextView);
+        mail = (TextView) findViewById(R.id.mailTextView);
         verifiedEmail = (TextView) findViewById(R.id.verifiedEmail);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -62,19 +62,18 @@ public class ProfileActivity extends AppCompatActivity {
         mDoctorsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot data : dataSnapshot.getChildren()){
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
                     Doctor doctor = data.getValue(Doctor.class);
-                    if(doctor.Email.equals(email)){
+                    if (doctor.Email.equals(email)) {
                         name.setText(doctor.Name + " " + doctor.Surname);
                         identity.setText("Doctor");
                         mail.setText(doctor.Email);
                     }
 
                     //Check if user is verified email address, if not click to verify
-                    if(mAuth.getCurrentUser().isEmailVerified()){
+                    if (mAuth.getCurrentUser().isEmailVerified()) {
                         verifiedEmail.setText("Email Verified");
-                    }
-                    else {
+                    } else {
                         verifiedEmail.setText("Email not Verified. Click to send Verification Email");
                         verifiedEmail.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -99,19 +98,18 @@ public class ProfileActivity extends AppCompatActivity {
         mPatientReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot data : dataSnapshot.getChildren()){
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
                     Patient patient = data.getValue(Patient.class);
-                    if(patient.Email.equals(email)){
+                    if (patient.Email.equals(email)) {
                         name.setText(patient.Name + " " + patient.Surname);
                         identity.setText("Patient");
                         mail.setText(patient.Email);
                     }
 
                     //Check if user is verified email address, if not click to verify
-                    if(mAuth.getCurrentUser().isEmailVerified()){
+                    if (mAuth.getCurrentUser().isEmailVerified()) {
                         verifiedEmail.setText("Email Verified");
-                    }
-                    else {
+                    } else {
                         verifiedEmail.setText("Email not Verified. Click to send Verification Email");
                         verifiedEmail.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -135,7 +133,7 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
-    public void createEvent(View view){
+    public void createEvent(View view) {
         final String email = mAuth.getCurrentUser().getEmail();
         mDoctorsReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -152,6 +150,7 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -170,7 +169,7 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.menuLogout:
                 FirebaseAuth.getInstance().signOut();
                 finish();
@@ -184,7 +183,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         //check if the user is not logged in
-        if(mAuth.getCurrentUser() == null){
+        if (mAuth.getCurrentUser() == null) {
             finish();
             startActivity(new Intent(this, LoginActivity.class));
         }
@@ -192,6 +191,40 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(this,UserActivity.class));
+        final String email = mAuth.getCurrentUser().getEmail();
+        mDoctorsReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    Doctor doctor = data.getValue(Doctor.class);
+                    if (doctor.Email.equals(email)) {
+                        startActivity(new Intent(getApplicationContext(), DoctorActivity.class));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        mPatientReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    Patient patient = data.getValue(Patient.class);
+                    if (patient.Email.equals(email)) {
+                        startActivity(new Intent(getApplicationContext(), PatientActivity.class));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }
+

@@ -18,4 +18,36 @@ public class NotificationPanel {
         this.accepted = accepted;
         this.patientToken = patientToken;
     }
+
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
+    }
+
+    public boolean isAccepted() {
+        return accepted;
+    }
+
+    public void setAccepted(boolean accepted) {
+        this.accepted = accepted;
+    }
+
+    public String getPatientToken() {
+        return patientToken;
+    }
+
+    public void setPatientToken(String patientToken) {
+        this.patientToken = patientToken;
+    }
 }

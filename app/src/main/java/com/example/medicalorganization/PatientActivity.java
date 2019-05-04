@@ -1,9 +1,9 @@
 package com.example.medicalorganization;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,17 +19,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class UserActivity extends AppCompatActivity {
+public class PatientActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFireDatabase;
-    private DatabaseReference mDoctorsReference, mPatientReference;
+    private DatabaseReference mPatientsReference;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user);
+        setContentView(R.layout.activity_patient);
 
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -37,31 +37,14 @@ public class UserActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mFireDatabase = FirebaseDatabase.getInstance();
-        mDoctorsReference = mFireDatabase.getReference().child("Doctors");
-        mPatientReference = mFireDatabase.getReference().child("Patients");
+        mPatientsReference = mFireDatabase.getReference().child("Patients");
     }
 
     public void openProfileActivity(View view) {startActivity(new Intent(this,ProfileActivity.class));}
 
-    public void openEventsActivity(View view) {
+    public void openAppointmentsActivity(View view) {
         final String email = mAuth.getCurrentUser().getEmail();
-        mDoctorsReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot data : dataSnapshot.getChildren()){
-                    Doctor doctor = data.getValue(Doctor.class);
-                    if(doctor.Email.equals(email)){
-                        startActivity(new Intent(getApplicationContext(), CalendarActivity.class));
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-        mPatientReference.addValueEventListener(new ValueEventListener() {
+        mPatientsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot data : dataSnapshot.getChildren()){

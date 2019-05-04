@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.medicalorganization">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -10,9 +11,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".AvailableEvents"></activity>
+        <activity android:name=".NotificationsActivity"></activity>
+        <activity android:name=".PatientActivity" />
+        <activity android:name=".AvailableEvents" />
         <activity android:name=".AppointmentPatientActivity" />
-        <activity android:name=".UserActivity" />
+        <activity android:name=".DoctorActivity" />
         <activity android:name=".EventsActivity" />
         <activity android:name=".CalendarActivity" />
         <activity android:name=".ProfileActivity" />
@@ -25,13 +28,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service android:name=".Services.MyFirebaseMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
     </application>
-
-
 
 </manifest>

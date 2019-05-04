@@ -42,7 +42,6 @@ public class DoctorsFragment extends Fragment {
 
         DoctorsRef = FirebaseDatabase.getInstance().getReference().child("Doctors");
 
-
         myDoctorsList.setLayoutManager(new LinearLayoutManager(getContext()));
 
         return doctorsView;

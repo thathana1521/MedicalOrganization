@@ -86,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if(task.isSuccessful()){
                                                     finish();
-                                                    Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+                                                    Intent intent = new Intent(getApplicationContext(), DoctorActivity.class);
                                                     //clear all activities on the top of the stack, when back button is pressed
                                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                                     startActivity(intent);
@@ -114,7 +114,7 @@ public class LoginActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if(task.isSuccessful()){
                                                     finish();
-                                                    Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+                                                    Intent intent = new Intent(getApplicationContext(), PatientActivity.class);
                                                     //clear all activities on the top of the stack, when back button is pressed
                                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                                     startActivity(intent);
