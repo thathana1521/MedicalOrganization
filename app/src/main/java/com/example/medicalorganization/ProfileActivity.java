@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -57,13 +58,15 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void loadUserInformation() {
 
-
         final String email = mAuth.getCurrentUser().getEmail();
+        Log.e("CHECK",email);
         mDoctorsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     Doctor doctor = data.getValue(Doctor.class);
+
                     if (doctor.Email.equals(email)) {
                         name.setText(doctor.Name + " " + doctor.Surname);
                         identity.setText("Doctor");
@@ -100,6 +103,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     Patient patient = data.getValue(Patient.class);
+
                     if (patient.Email.equals(email)) {
                         name.setText(patient.Name + " " + patient.Surname);
                         identity.setText("Patient");
@@ -122,31 +126,6 @@ public class ProfileActivity extends AppCompatActivity {
                                 });
                             }
                         });
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    public void createEvent(View view) {
-        final String email = mAuth.getCurrentUser().getEmail();
-        mDoctorsReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    Doctor doctor = data.getValue(Doctor.class);
-                    //Toast.makeText(getApplicationContext(),"Identity = "+user.Identity,Toast.LENGTH_LONG).show();
-                    //Ean o xrhsths uparxei sti vasi kai einai giatros tote anoixe to calendar view gia na ftiaxei diathesimo rantevou
-                    if (doctor.Email.equals(email)) {
-                        Intent intent = new Intent(getApplicationContext(), CalendarActivity.class);
-                        String doctorName = doctor.Name + " " + doctor.Surname;
-                        intent.putExtra("doctorName", doctorName);
-                        startActivity(intent);
                     }
                 }
             }

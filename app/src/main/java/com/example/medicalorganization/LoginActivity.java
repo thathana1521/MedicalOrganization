@@ -107,7 +107,7 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if (dataSnapshot.hasChild(currentUserId)){
-                                mPatientsDatabaseReference.child(currentUserId).child("device_token")
+                                mPatientsDatabaseReference.child(currentUserId).child("Device_Token")
                                         .setValue(token[0])
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override

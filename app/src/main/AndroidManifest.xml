@@ -11,13 +11,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".NotificationsActivity"></activity>
+        <activity android:name=".SetEventActivity"></activity>
+        <activity android:name=".NotificationsActivity" />
         <activity android:name=".PatientActivity" />
         <activity android:name=".AvailableEvents" />
         <activity android:name=".AppointmentPatientActivity" />
         <activity android:name=".DoctorActivity" />
         <activity android:name=".EventsActivity" />
-        <activity android:name=".CalendarActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" />

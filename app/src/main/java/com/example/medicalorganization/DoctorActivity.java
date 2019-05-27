@@ -50,7 +50,7 @@ public class DoctorActivity extends AppCompatActivity {
                 for(DataSnapshot data : dataSnapshot.getChildren()){
                     Doctor doctor = data.getValue(Doctor.class);
                     if(doctor.Email.equals(email)){
-                        startActivity(new Intent(getApplicationContext(), CalendarActivity.class));
+                        startActivity(new Intent(getApplicationContext(), SetEventActivity.class));
                     }
                 }
             }

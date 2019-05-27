@@ -118,7 +118,6 @@ public class AvailableEvents extends AppCompatActivity {
                             String startingTime = model.startTime.getHours() + ":" + model.startTime.getMinutes();
                             String endingTime = model.endTime.getHours() + ":" + model.endTime.getMinutes();
 
-
                             holder.setDate(date);
                             holder.setHour(startingTime + " - " + endingTime);
 
@@ -127,7 +126,7 @@ public class AvailableEvents extends AppCompatActivity {
                                 public void onClick(View v) {
                                     //otan o asthenis kanei click se ena apo ta events na stelnei notification
                                     final Retrofit retrofit = new Retrofit.Builder()
-                                            .baseUrl("https://medicalorganization-7b35a.firebaseapp.com/api/")
+                                            .baseUrl("https://medicalorganization-7b35a.firebaseapp.com/api1/")
                                             .addConverterFactory(GsonConverterFactory.create())
                                             .build();
                                     final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -146,9 +145,9 @@ public class AvailableEvents extends AppCompatActivity {
                                                 call.enqueue(new Callback<ResponseBody>() {
                                                     @Override
                                                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-
-                                                        Toast.makeText(getApplicationContext(),"Notification sent to the Doctor", Toast.LENGTH_LONG).show();
                                                         setNotification(patientName, model, received_user_id, patientToken);
+                                                        Toast.makeText(getApplicationContext(),"Notification sent to the Doctor", Toast.LENGTH_LONG).show();
+
                                                     }
 
                                                     @Override
@@ -165,8 +164,6 @@ public class AvailableEvents extends AppCompatActivity {
                                         }
                                     });
                                     Toast.makeText(getApplicationContext(), patientName, Toast.LENGTH_LONG).show();
-
-
                                 }
                             });
 
