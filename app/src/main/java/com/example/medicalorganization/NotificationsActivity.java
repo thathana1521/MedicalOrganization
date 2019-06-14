@@ -51,12 +51,14 @@ public class NotificationsActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mAuth;
-    private DatabaseReference DoctorsRef, NotifRef;
+    private DatabaseReference DoctorsRef, NotifRef, EventsRef;
 
     public Dialog dialog;
     public Button acceptButton, rejectButton;
     public ImageView closePopup;
     public TextView descriptionTextView;
+
+    private String patientId;
 
 
     @Override
@@ -67,8 +69,11 @@ public class NotificationsActivity extends AppCompatActivity {
         dialog = new Dialog(this);
 
 
+
         mAuth = FirebaseAuth.getInstance();
+
         mFirebaseDatabase = FirebaseDatabase.getInstance();
+
         DoctorsRef = mFirebaseDatabase.getInstance().getReference().child("Doctors").child(mAuth.getCurrentUser().getUid());
         NotifRef = (DatabaseReference) mFirebaseDatabase.getInstance().getReference().child("Doctors").child(mAuth.getCurrentUser().getUid()).child("Notifications");
         final Query notifQuery = NotifRef.orderByChild("accepted").equalTo(false);
@@ -88,8 +93,7 @@ public class NotificationsActivity extends AppCompatActivity {
                     NotifRef.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for(DataSnapshot data : dataSnapshot.getChildren()){
-
+                            for (DataSnapshot data : dataSnapshot.getChildren()) {
                                 notificationsIdList.add(data.getKey());
                             }
                         }
@@ -110,7 +114,7 @@ public class NotificationsActivity extends AppCompatActivity {
                         @Override
                         protected void onBindViewHolder(@NonNull final NotifViewHolder holder, final int position, @NonNull final NotificationPanel model) {
                             //ean to notification den exei ginei apodekto tote mpainei sto recyclerview
-                            if(!model.accepted) {
+                            if (!model.accepted) {
                                 String patientName = model.patientName;
                                 String date = model.event.date.toString();
 
@@ -118,8 +122,8 @@ public class NotificationsActivity extends AppCompatActivity {
                                 holder.mView.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        String id = notificationsIdList.get(position);
-                                        ShowPopup(model, id);
+
+                                        ShowPopup(model);
                                     }
                                 });
                             }
@@ -140,7 +144,6 @@ public class NotificationsActivity extends AppCompatActivity {
                     finish();
                 }
             }
-
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -166,7 +169,7 @@ public class NotificationsActivity extends AppCompatActivity {
         }
     }
 
-    private void ShowPopup(final NotificationPanel panel, final String id) {
+    private void ShowPopup(final NotificationPanel panel) {
         dialog.setContentView(R.layout.popup_appointment);
         closePopup = (ImageView) dialog.findViewById(R.id.closeImageView);
         acceptButton = (Button) dialog.findViewById(R.id.accept_button);
@@ -185,7 +188,8 @@ public class NotificationsActivity extends AppCompatActivity {
         acceptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendNotificationToPatient(panel, id);
+                sendNotificationToPatient(panel);
+                addEventOnPatient(panel.patientId, panel.event);
                 dialog.dismiss();
             }
         });
@@ -202,7 +206,13 @@ public class NotificationsActivity extends AppCompatActivity {
 
     }
 
-    public void sendNotificationToPatient(final NotificationPanel panel, final String id) {
+    private void addEventOnPatient(String patientID, Event event) {
+        Toast.makeText(getApplicationContext(),patientID,Toast.LENGTH_LONG).show();
+        EventsRef = mFirebaseDatabase.getReference().child("Patients").child(patientID).child("Events");
+        EventsRef.push().setValue(event);
+    }
+
+    public void sendNotificationToPatient(final NotificationPanel panel) {
         final Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://medicalorganization-7b35a.firebaseapp.com/api1/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -215,19 +225,6 @@ public class NotificationsActivity extends AppCompatActivity {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
                 Toast.makeText(getApplicationContext(), "Notification sent to the Patient", Toast.LENGTH_LONG).show();
-
-                FirebaseDatabase.getInstance().getReference().child("Patients")
-                        .child(mAuth.getCurrentUser().getUid())
-                        .child("Notifications")
-                        .child(id)
-                        .child("accepted")
-                        .setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(getApplicationContext(),"Event successfully accepted", Toast.LENGTH_LONG).show();
-                    }
-                });
-
             }
 
             @Override

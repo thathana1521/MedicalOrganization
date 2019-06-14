@@ -47,5 +47,11 @@
     <color name="alertColorWhite">#ffffff</color>
     <color name="alertColorAccent">#FF4081</color>
 
+    //Fragments Colors
+    <color name="fragmentColorPrimary">#393939</color>
+    <color name="fragmentColorPrimaryDark">#2f2f2f</color>
+    <color name="fragmentColorAccent">#52b7f8</color>
+    <color name="fragmentBackground">#2b2b2b</color>
+
 
 </resources>

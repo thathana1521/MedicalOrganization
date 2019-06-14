@@ -10,21 +10,35 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.support.v7.widget.SearchView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.medicalorganization.Adapters.DoctorAdapter;
 import com.example.medicalorganization.AvailableEvents;
 import com.example.medicalorganization.Models.Doctor;
 import com.example.medicalorganization.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+
+
 
 public class DoctorsFragment extends Fragment {
 
     private View doctorsView;
     private RecyclerView myDoctorsList;
+    private SearchView searchBar;
+    private ArrayList<Doctor> doctorList;
 
     private DatabaseReference DoctorsRef;
 
@@ -36,8 +50,10 @@ public class DoctorsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
+
         doctorsView = inflater.inflate(R.layout.fragment_doctors, container, false);
 
+        searchBar = (SearchView) doctorsView.findViewById(R.id.searchBar);
         myDoctorsList = (RecyclerView) doctorsView.findViewById(R.id.doctors_list);
 
         DoctorsRef = FirebaseDatabase.getInstance().getReference().child("Doctors");
@@ -50,9 +66,35 @@ public class DoctorsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+
+        firebaseSearch("");
+        if (searchBar != null) {
+            searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    firebaseSearch(newText);
+                    return true;
+                }
+            });
+        }
+    }
+
+    private void firebaseSearch(String search) {
+        Query query;
+        if(!(search.isEmpty())) {
+            query = DoctorsRef.orderByChild("Surname").startAt(search).endAt(search + "\uf8ff");
+        }
+        else{
+            query = DoctorsRef;
+        }
         FirebaseRecyclerOptions options =
                 new FirebaseRecyclerOptions.Builder<Doctor>()
-                        .setQuery(DoctorsRef, Doctor.class)
+                        .setQuery(query, Doctor.class)
                         .build();
 
         FirebaseRecyclerAdapter<Doctor, DoctorsViewHolder> adapter
@@ -89,17 +131,21 @@ public class DoctorsFragment extends Fragment {
         adapter.startListening();
     }
 
-    public static class DoctorsViewHolder extends RecyclerView.ViewHolder{
+
+    public static class DoctorsViewHolder extends RecyclerView.ViewHolder {
 
         View mView;
         TextView doctorName;
+
         public DoctorsViewHolder(@NonNull View itemView) {
             super(itemView);
             mView = itemView;
         }
-        public void setDoctorName(String name){
+
+        public void setDoctorName(String name) {
             doctorName = (TextView) mView.findViewById(R.id.doctorName);
             doctorName.setText(name);
         }
     }
 }
+

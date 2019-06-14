@@ -69,7 +69,7 @@ public class AvailableEvents extends AppCompatActivity {
     private String received_user_id, doctorToken;
     private DatabaseReference EventReference, checkReferenceForEvents, mPatientReference;
     private FirebaseDatabase mFireDatabase;
-    private String patientName, patientToken;
+    private String patientName, patientToken, patientId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +82,7 @@ public class AvailableEvents extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mFireDatabase = FirebaseDatabase.getInstance();
         mPatientReference = mFireDatabase.getReference().child("Patients");
+        patientId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
 
         EventReference = FirebaseDatabase.getInstance().getReference().child("Doctors").child(received_user_id).child("Events");
@@ -145,7 +146,7 @@ public class AvailableEvents extends AppCompatActivity {
                                                 call.enqueue(new Callback<ResponseBody>() {
                                                     @Override
                                                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                        setNotification(patientName, model, received_user_id, patientToken);
+                                                        setNotification(patientName, model, received_user_id, patientToken, patientId);
                                                         Toast.makeText(getApplicationContext(),"Notification sent to the Doctor", Toast.LENGTH_LONG).show();
 
                                                     }
@@ -194,8 +195,8 @@ public class AvailableEvents extends AppCompatActivity {
         });
     }
 
-    private void setNotification(String name, Event event, String doctorID, String patientToken) {
-        NotificationPanel notificationPanel = new NotificationPanel(name, event, false, patientToken);
+    private void setNotification(String name, Event event, String doctorID, String patientToken, String patientId) {
+        NotificationPanel notificationPanel = new NotificationPanel(name, event, false, patientToken, patientId);
         FirebaseDatabase.getInstance().getReference("Doctors")
                 .child(doctorID)
                 .child("Notifications")

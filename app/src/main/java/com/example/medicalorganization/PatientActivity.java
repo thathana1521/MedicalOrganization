@@ -31,7 +31,6 @@ public class PatientActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_patient);
 
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -80,5 +79,9 @@ public class PatientActivity extends AppCompatActivity {
                 break;
         }
         return true;
+    }
+
+    public void openRatingActivity(View view) {
+
     }
 }

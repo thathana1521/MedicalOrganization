@@ -9,14 +9,16 @@ public class NotificationPanel {
     public boolean accepted;
 
     public String patientToken;
+    public String patientId;
 
     public NotificationPanel(){}
 
-    public NotificationPanel(String patientName, Event event, boolean accepted, String patientToken) {
+    public NotificationPanel(String patientName, Event event, boolean accepted, String patientToken, String patientID) {
         this.patientName = patientName;
         this.event = event;
         this.accepted = accepted;
         this.patientToken = patientToken;
+        this.patientId = patientID;
     }
 
     public String getPatientName() {
@@ -49,5 +51,13 @@ public class NotificationPanel {
 
     public void setPatientToken(String patientToken) {
         this.patientToken = patientToken;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
     }
 }
