@@ -3,6 +3,7 @@ package com.example.medicalorganization;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.medicalorganization.Interfaces.Api;
+import com.example.medicalorganization.Models.Doctor;
 import com.example.medicalorganization.Models.Event;
 import com.example.medicalorganization.Models.NotificationPanel;
 import com.example.medicalorganization.Models.Patient;
@@ -47,8 +49,6 @@ public class NotificationsActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
 
-    private List<String> notificationsIdList = new ArrayList<>();
-
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mAuth;
     private DatabaseReference DoctorsRef, NotifRef, EventsRef;
@@ -58,17 +58,12 @@ public class NotificationsActivity extends AppCompatActivity {
     public ImageView closePopup;
     public TextView descriptionTextView;
 
-    private String patientId;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notifications);
 
         dialog = new Dialog(this);
-
-
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -89,12 +84,15 @@ public class NotificationsActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 if (dataSnapshot.hasChild("Notifications")) {
-                    //save the keys of notifications on list
-                    NotifRef.addValueEventListener(new ValueEventListener() {
+
+                    notifQuery.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot data : dataSnapshot.getChildren()) {
-                                notificationsIdList.add(data.getKey());
+                            if(dataSnapshot.hasChildren()){
+                                displayNotifications(notifQuery);
+                            }else {
+                                Toast.makeText(getApplicationContext(), "No available Notifications", Toast.LENGTH_LONG).show();
+                                finish();
                             }
                         }
 
@@ -104,41 +102,6 @@ public class NotificationsActivity extends AppCompatActivity {
                         }
                     });
 
-                    FirebaseRecyclerOptions options =
-                            new FirebaseRecyclerOptions.Builder<NotificationPanel>()
-                                    .setQuery(notifQuery, NotificationPanel.class)
-                                    .build();
-
-                    FirebaseRecyclerAdapter<NotificationPanel, NotifViewHolder> adapter
-                            = new FirebaseRecyclerAdapter<NotificationPanel, NotifViewHolder>(options) {
-                        @Override
-                        protected void onBindViewHolder(@NonNull final NotifViewHolder holder, final int position, @NonNull final NotificationPanel model) {
-                            //ean to notification den exei ginei apodekto tote mpainei sto recyclerview
-                            if (!model.accepted) {
-                                String patientName = model.patientName;
-                                String date = model.event.date.toString();
-
-                                holder.setDescription(patientName + " has requested an appointment on " + date);
-                                holder.mView.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                        ShowPopup(model);
-                                    }
-                                });
-                            }
-                        }
-
-                        @NonNull
-                        @Override
-                        public NotifViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-                            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_notification, viewGroup, false);
-                            NotifViewHolder viewHolder = new NotifViewHolder(view);
-                            return viewHolder;
-                        }
-                    };
-                    recyclerView.setAdapter(adapter);
-                    adapter.startListening();
                 } else {
                     Toast.makeText(getApplicationContext(), "No available Notifications", Toast.LENGTH_LONG).show();
                     finish();
@@ -151,6 +114,44 @@ public class NotificationsActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void displayNotifications(Query notifQuery) {
+        FirebaseRecyclerOptions options =
+                new FirebaseRecyclerOptions.Builder<NotificationPanel>()
+                        .setQuery(notifQuery, NotificationPanel.class)
+                        .build();
+
+        FirebaseRecyclerAdapter<NotificationPanel, NotifViewHolder> adapter
+                = new FirebaseRecyclerAdapter<NotificationPanel, NotifViewHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull final NotifViewHolder holder, final int position, @NonNull final NotificationPanel model) {
+                //ean to notification den exei ginei apodekto tote mpainei sto recyclerview
+                if (!model.accepted) {
+                    String patientName = model.patientName;
+                    String date = model.event.date.toString();
+
+                    holder.setDescription(patientName + " has requested an appointment on " + date);
+                    holder.mView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String id = getRef(position).getKey();
+                            ShowPopup(model, id);
+                        }
+                    });
+                }
+            }
+
+            @NonNull
+            @Override
+            public NotifViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+                View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_notification, viewGroup, false);
+                NotifViewHolder viewHolder = new NotifViewHolder(view);
+                return viewHolder;
+            }
+        };
+        recyclerView.setAdapter(adapter);
+        adapter.startListening();
     }
 
     public static class NotifViewHolder extends RecyclerView.ViewHolder {
@@ -169,7 +170,7 @@ public class NotificationsActivity extends AppCompatActivity {
         }
     }
 
-    private void ShowPopup(final NotificationPanel panel) {
+    private void ShowPopup(final NotificationPanel panel, final String notificationId) {
         dialog.setContentView(R.layout.popup_appointment);
         closePopup = (ImageView) dialog.findViewById(R.id.closeImageView);
         acceptButton = (Button) dialog.findViewById(R.id.accept_button);
@@ -188,8 +189,10 @@ public class NotificationsActivity extends AppCompatActivity {
         acceptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendNotificationToPatient(panel);
+                sendNotificationToPatient(panel, true);
                 addEventOnPatient(panel.patientId, panel.event);
+                addDoctorOnPatient(panel.patientId);
+                makeNotificationAccepted(notificationId);
                 dialog.dismiss();
             }
         });
@@ -197,7 +200,8 @@ public class NotificationsActivity extends AppCompatActivity {
         rejectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //send notification to patient that the appointment rejected
+                sendNotificationToPatient(panel, false);
+                dialog.dismiss();
             }
         });
 
@@ -206,19 +210,82 @@ public class NotificationsActivity extends AppCompatActivity {
 
     }
 
+    private void makeNotificationAccepted(String notificationId) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
+                .child("Doctors")
+                .child(mAuth.getCurrentUser().getUid())
+                .child("Notifications")
+                .child(notificationId)
+                .child("accepted");
+                ref.setValue(true);
+    }
+
+    private void addDoctorOnPatient(final String patientId) {
+        DatabaseReference docRef = FirebaseDatabase.getInstance().getReference().child("Doctors");
+        final Boolean[] found = {true};
+        docRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    final Doctor doctor = data.getValue(Doctor.class);
+                    final DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().child("Patients").child(patientId).child("Accepted Doctors");
+
+                    if(mAuth.getCurrentUser().getEmail().equals(doctor.Email)){
+                        myRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.hasChildren()){
+                                    for(DataSnapshot data : dataSnapshot.getChildren()){
+                                        final Doctor doc = data.getValue(Doctor.class);
+                                        if(mAuth.getCurrentUser().getEmail().equals(doc.Email)){
+                                            found[0] = false;
+                                        }
+                                    }
+                                    if(found[0]) {
+                                        myRef.push().setValue(doctor);
+                                    }
+                                }
+                                else{
+                                    myRef.push().setValue(doctor);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     private void addEventOnPatient(String patientID, Event event) {
-        Toast.makeText(getApplicationContext(),patientID,Toast.LENGTH_LONG).show();
         EventsRef = mFirebaseDatabase.getReference().child("Patients").child(patientID).child("Events");
         EventsRef.push().setValue(event);
     }
 
-    public void sendNotificationToPatient(final NotificationPanel panel) {
+    public void sendNotificationToPatient(final NotificationPanel panel, boolean accepted) {
+        String response;
+        if(accepted){
+            response="Your request has been accepted!";
+        }
+        else{
+            response="Your request has been rejected. Please search for another appointment.";
+        }
         final Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://medicalorganization-7b35a.firebaseapp.com/api1/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         Api api = retrofit.create(Api.class);
-        Call<ResponseBody> call = api.sendNotification(panel.patientToken, "Your Request has been accepted", "");
+        Call<ResponseBody> call = api.sendNotification(panel.patientToken, response, "");
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -229,7 +296,7 @@ public class NotificationsActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), "Some error occured. The doctor did not receive the notification", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Some error occured. The patient did not receive the notification", Toast.LENGTH_LONG).show();
             }
         });
 

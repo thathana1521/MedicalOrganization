@@ -1,5 +1,7 @@
 package com.example.medicalorganization.Models;
 
+import java.util.List;
+
 public class Doctor {
 
     public String Name;
@@ -12,6 +14,8 @@ public class Doctor {
 
     public String Device_Token;
 
+
+
     public Doctor(){
         // Default constructor required for calls to DataSnapshot.getValue(Doctor.class)
     }
@@ -23,6 +27,7 @@ public class Doctor {
         this.Age = age;
         this.Email = email;
         this.Device_Token = device_token;
+
     }
 
 }
