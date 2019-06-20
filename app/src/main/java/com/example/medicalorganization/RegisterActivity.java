@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.example.medicalorganization.Models.Doctor;
 import com.example.medicalorganization.Models.Patient;
+import com.example.medicalorganization.Models.Rating;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -21,6 +22,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -108,9 +112,9 @@ public class RegisterActivity extends AppCompatActivity {
                             //we will store the additional fields in firebase database
                             if(identityId == 1){
 
-                                //if Doctor
+                                //if doctor
 
-                                Doctor doctor = new Doctor(str_name, str_surname, str_age, str_email, token[0]);
+                                Doctor doctor = new Doctor(str_name, str_surname, str_age, str_email, token[0], 0);
                                 FirebaseDatabase.getInstance().getReference("Doctors")
                                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(doctor).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override

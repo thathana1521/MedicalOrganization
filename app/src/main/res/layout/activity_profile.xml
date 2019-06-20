@@ -99,11 +99,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:id="@+id/ratingTitle"
                         android:text="Δεν ξερω"
                         android:textSize="20dp"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:id="@+id/ratingTextView"
                         android:text="125"
                         android:textStyle="bold"
                         android:textSize="20dp"

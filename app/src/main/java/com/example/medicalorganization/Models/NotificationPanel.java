@@ -5,6 +5,7 @@ public class NotificationPanel {
     public String patientName;
 
     public Event event;
+    public String eventId;
 
     public boolean accepted;
 
@@ -13,9 +14,10 @@ public class NotificationPanel {
 
     public NotificationPanel(){}
 
-    public NotificationPanel(String patientName, Event event, boolean accepted, String patientToken, String patientID) {
+    public NotificationPanel(String patientName, Event event, String eventId, boolean accepted, String patientToken, String patientID) {
         this.patientName = patientName;
         this.event = event;
+        this.eventId = eventId;
         this.accepted = accepted;
         this.patientToken = patientToken;
         this.patientId = patientID;

@@ -23,6 +23,8 @@ import android.widget.Toast;
 
 import com.example.medicalorganization.AvailableEvents;
 import com.example.medicalorganization.Models.Doctor;
+import com.example.medicalorganization.Models.Patient;
+import com.example.medicalorganization.Models.Rating;
 import com.example.medicalorganization.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -46,11 +48,11 @@ public class RateFragment extends Fragment {
     private TextView mRatingTV;
     private Button sendFeedbackBtn;
     public ImageView closePopup;
-    final String[] doctorId = {null};
+    public final String[] doctorId = {null};
 
 
 
-    private DatabaseReference DoctorsRef;
+    private DatabaseReference DoctorsRef, PatientsRef;
 
     public RateFragment() {
         //Required empty public constructor
@@ -67,6 +69,7 @@ public class RateFragment extends Fragment {
         myDoctorsList = (RecyclerView) doctorsView.findViewById(R.id.doctors_list);
 
         DoctorsRef = FirebaseDatabase.getInstance().getReference().child("Doctors");
+        PatientsRef = FirebaseDatabase.getInstance().getReference().child("Patients");
 
         myDoctorsList.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -120,8 +123,7 @@ public class RateFragment extends Fragment {
                 holder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String doctorId = findDoctorId(model);
-                        ShowPopup(doctorId);
+                       findDoctorId(model);
                     }
                 });
             }
@@ -139,7 +141,7 @@ public class RateFragment extends Fragment {
         adapter.startListening();
     }
 
-    private String findDoctorId(final Doctor model) {
+    private void findDoctorId(final Doctor model) {
         DatabaseReference docRef = FirebaseDatabase.getInstance().getReference().child("Doctors");
 
         docRef.addValueEventListener(new ValueEventListener() {
@@ -148,9 +150,8 @@ public class RateFragment extends Fragment {
                 for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                     Doctor doctor = dataSnapshot1.getValue(Doctor.class);
                     if(doctor.Email.equals(model.Email)){
-                        doctorId[0] = dataSnapshot1.getKey();
+                        ShowPopup(dataSnapshot1.getKey());
                     }
-
                 }
             }
 
@@ -159,11 +160,10 @@ public class RateFragment extends Fragment {
 
             }
         });
-        Toast.makeText(getContext(), doctorId[0], Toast.LENGTH_SHORT).show();
-        return doctorId[0];
     }
 
-    private void ShowPopup(final String doctorId) {
+    public void ShowPopup(final String doctorId) {
+        //Toast.makeText(getContext(),doctorId,Toast.LENGTH_LONG).show();
         dialog.setContentView(R.layout.popup_rate);
         mRatingBar = (RatingBar) dialog.findViewById(R.id.ratingBar);
         mRatingTV = (TextView)dialog.findViewById(R.id.tvRatingScale);
@@ -175,25 +175,30 @@ public class RateFragment extends Fragment {
                 dialog.dismiss();
             }
         });
-
+        final int[] rating = new int[1];
         mRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
                 mRatingTV.setText(String.valueOf(v));
                 switch ((int) ratingBar.getRating()) {
                     case 1:
+                        rating[0] = 1;
                         mRatingTV.setText("Very bad");
                         break;
                     case 2:
+                        rating[0] = 2;
                         mRatingTV.setText("Need some improvement");
                         break;
                     case 3:
+                        rating[0] = 3;
                         mRatingTV.setText("Good");
                         break;
                     case 4:
+                        rating[0] = 4;
                         mRatingTV.setText("Great");
                         break;
                     case 5:
+                        rating[0] = 5;
                         mRatingTV.setText("Awesome. I love it");
                         break;
                     default:
@@ -205,8 +210,7 @@ public class RateFragment extends Fragment {
         sendFeedbackBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addRatingToDoctor(doctorId);
-                //Toast.makeText(getContext(), "Thank you for sharing your feedback", Toast.LENGTH_SHORT).show();
+                addRatingToDoctor(doctorId, rating[0]);
                 dialog.dismiss();
             }
         });
@@ -215,7 +219,30 @@ public class RateFragment extends Fragment {
         dialog.show();
     }
 
-    private void addRatingToDoctor(String doctorId) {
+    private void addRatingToDoctor(final String doctorId, final int rating) {
+
+        final String[] patientName = new String[1];
+        PatientsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot data : dataSnapshot.getChildren()){
+                    Patient patient = data.getValue(Patient.class);
+                    if(patient.Email.equals(mAuth.getCurrentUser().getEmail())) {
+                        patientName[0] = patient.Name + " " + patient.Surname;
+                        Rating rate = new Rating(rating, patientName[0]);
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Doctors")
+                                .child(doctorId)
+                                .child("Ratings");
+                        reference.push().setValue(rate);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
     }
 

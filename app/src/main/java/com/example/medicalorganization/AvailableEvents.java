@@ -37,6 +37,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
@@ -105,81 +106,100 @@ public class AvailableEvents extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 //ean o giatros exei prosthesei kapoia events
                 if (dataSnapshot.hasChild("Events")){
-                    FirebaseRecyclerOptions options =
-                            new FirebaseRecyclerOptions.Builder<Event>()
-                                    .setQuery(EventReference, Event.class)
-                                    .build();
-
-                    FirebaseRecyclerAdapter<Event, EventsViewHolder> adapter
-                            = new FirebaseRecyclerAdapter<Event, AvailableEvents.EventsViewHolder>(options) {
+                    final Query query = EventReference.orderByChild("accepted").equalTo(false);
+                    query.addValueEventListener(new ValueEventListener() {
                         @Override
-                        protected void onBindViewHolder(@NonNull final AvailableEvents.EventsViewHolder holder, final int position, @NonNull final Event model) {
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.hasChildren()){
+                                FirebaseRecyclerOptions options =
+                                        new FirebaseRecyclerOptions.Builder<Event>()
+                                                .setQuery(query, Event.class)
+                                                .build();
 
-                            String date = model.date.getDay() + "-" + model.date.getMonth() + "-" + model.date.getYear();
-                            String startingTime = model.startTime.getHours() + ":" + model.startTime.getMinutes();
-                            String endingTime = model.endTime.getHours() + ":" + model.endTime.getMinutes();
+                                FirebaseRecyclerAdapter<Event, EventsViewHolder> adapter
+                                        = new FirebaseRecyclerAdapter<Event, AvailableEvents.EventsViewHolder>(options) {
+                                    @Override
+                                    protected void onBindViewHolder(@NonNull final AvailableEvents.EventsViewHolder holder, final int position, @NonNull final Event model) {
 
-                            holder.setDate(date);
-                            holder.setHour(startingTime + " - " + endingTime);
+                                        String date = model.date.getDay() + "-" + model.date.getMonth() + "-" + model.date.getYear();
+                                        String startingTime = model.startTime.getHours() + ":" + model.startTime.getMinutes();
+                                        String endingTime = model.endTime.getHours() + ":" + model.endTime.getMinutes();
+                                        final String eventId = getRef(position).getKey();
 
-                            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    //otan o asthenis kanei click se ena apo ta events na stelnei notification
-                                    final Retrofit retrofit = new Retrofit.Builder()
-                                            .baseUrl("https://medicalorganization-7b35a.firebaseapp.com/api1/")
-                                            .addConverterFactory(GsonConverterFactory.create())
-                                            .build();
-                                    final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                                    mPatientReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            for(DataSnapshot data: dataSnapshot.getChildren()){
-                                                Patient patient = data.getValue(Patient.class);
-                                                if(patient.Email.equals(user.getEmail())){
-                                                    patientToken = patient.Device_Token;
-                                                    setPatientName(patient.Name + " " + patient.Surname);
-                                                }
-                                                Api api = retrofit.create(Api.class);
-                                                Call<ResponseBody> call = api.sendNotification(doctorToken, "New appointment request", patientName + " have requested an appointment for " + model.date.getDate());
+                                        holder.setDate(date);
+                                        holder.setHour(startingTime + " - " + endingTime);
 
-                                                call.enqueue(new Callback<ResponseBody>() {
+                                        holder.itemView.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                //otan o asthenis kanei click se ena apo ta events na stelnei notification
+                                                final Retrofit retrofit = new Retrofit.Builder()
+                                                        .baseUrl("https://medicalorganization-7b35a.firebaseapp.com/api1/")
+                                                        .addConverterFactory(GsonConverterFactory.create())
+                                                        .build();
+                                                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                                mPatientReference.addListenerForSingleValueEvent(new ValueEventListener() {
                                                     @Override
-                                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                        setNotification(patientName, model, received_user_id, patientToken, patientId);
-                                                        Toast.makeText(getApplicationContext(),"Notification sent to the Doctor", Toast.LENGTH_LONG).show();
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        for(DataSnapshot data: dataSnapshot.getChildren()){
+                                                            Patient patient = data.getValue(Patient.class);
+                                                            if(patient.Email.equals(user.getEmail())){
+                                                                patientToken = patient.Device_Token;
+                                                                setPatientName(patient.Name + " " + patient.Surname);
+                                                            }
+                                                            Api api = retrofit.create(Api.class);
+                                                            Call<ResponseBody> call = api.sendNotification(doctorToken, "New appointment request", patientName + " have requested an appointment for " + model.date.getDate());
 
+                                                            call.enqueue(new Callback<ResponseBody>() {
+                                                                @Override
+                                                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                                    setNotification(patientName, model, eventId, received_user_id, patientToken, patientId);
+                                                                    Toast.makeText(getApplicationContext(),"Notification sent to the Doctor", Toast.LENGTH_LONG).show();
+
+                                                                }
+
+                                                                @Override
+                                                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                                                    Toast.makeText(getApplicationContext(),"Some error occured. The doctor did not receive the notification", Toast.LENGTH_LONG).show();
+                                                                }
+                                                            });
+                                                        }
                                                     }
 
                                                     @Override
-                                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                                        Toast.makeText(getApplicationContext(),"Some error occured. The doctor did not receive the notification", Toast.LENGTH_LONG).show();
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                                                     }
                                                 });
+                                                Toast.makeText(getApplicationContext(), patientName, Toast.LENGTH_LONG).show();
                                             }
-                                        }
+                                        });
 
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    }
 
-                                        }
-                                    });
-                                    Toast.makeText(getApplicationContext(), patientName, Toast.LENGTH_LONG).show();
-                                }
-                            });
-
+                                    @NonNull
+                                    @Override
+                                    public AvailableEvents.EventsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+                                        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_event, viewGroup, false);
+                                        AvailableEvents.EventsViewHolder viewHolder = new AvailableEvents.EventsViewHolder(view);
+                                        return viewHolder;
+                                    }
+                                };
+                                myEventsList.setAdapter(adapter);
+                                adapter.startListening();
+                            }
+                            else{
+                                Toast.makeText(getApplicationContext(),"No available events for this Doctor", Toast.LENGTH_LONG).show();
+                                finish();
+                            }
                         }
 
-                        @NonNull
                         @Override
-                        public AvailableEvents.EventsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-                            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_event, viewGroup, false);
-                            AvailableEvents.EventsViewHolder viewHolder = new AvailableEvents.EventsViewHolder(view);
-                            return viewHolder;
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
                         }
-                    };
-                    myEventsList.setAdapter(adapter);
-                    adapter.startListening();
+                    });
+
                 }
                 //ean den exei events o sugkekrimenos giatros totet vgale mhnuma kai termatise tin activity
                 else {
@@ -195,8 +215,8 @@ public class AvailableEvents extends AppCompatActivity {
         });
     }
 
-    private void setNotification(String name, Event event, String doctorID, String patientToken, String patientId) {
-        NotificationPanel notificationPanel = new NotificationPanel(name, event, false, patientToken, patientId);
+    private void setNotification(String name, Event event, String eventId, String doctorID, String patientToken, String patientId) {
+        NotificationPanel notificationPanel = new NotificationPanel(name, event, eventId, false, patientToken, patientId);
         FirebaseDatabase.getInstance().getReference("Doctors")
                 .child(doctorID)
                 .child("Notifications")

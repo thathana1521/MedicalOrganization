@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -193,6 +194,8 @@ public class NotificationsActivity extends AppCompatActivity {
                 addEventOnPatient(panel.patientId, panel.event);
                 addDoctorOnPatient(panel.patientId);
                 makeNotificationAccepted(notificationId);
+                addAppointmentOnDoctor();
+                makeEventAccepted(panel.eventId);
                 dialog.dismiss();
             }
         });
@@ -207,6 +210,43 @@ public class NotificationsActivity extends AppCompatActivity {
 
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
+
+    }
+
+    private void makeEventAccepted(String eventId) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
+                .child("Doctors")
+                .child(mAuth.getCurrentUser().getUid())
+                .child("Events")
+                .child(eventId)
+                .child("accepted");
+        ref.setValue(true);
+    }
+
+    private void addAppointmentOnDoctor() {
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
+                .child("Doctors");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot data : dataSnapshot.getChildren()){
+
+                    Doctor doctor = data.getValue(Doctor.class);
+                    if(doctor.Email.equals(mAuth.getCurrentUser().getEmail())){
+                        int appointments = doctor.Appointments;
+                        appointments= appointments+1;
+
+                        DatabaseReference appRef = ref.child(mAuth.getCurrentUser().getUid()).child("Appointments");
+                        appRef.setValue(appointments);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
