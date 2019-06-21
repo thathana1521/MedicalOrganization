@@ -10,12 +10,19 @@
     android:padding="50dp"
     tools:context="com.example.medicalorganization.LoginActivity">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Welcome to Doctorganize"
+        android:textSize="25dp"
+        android:textColor="@color/alertColorWhite"
+        android:layout_marginBottom="10dp"/>
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        app:srcCompat="@drawable/ic_lock_outline_white" />
+        app:srcCompat="@drawable/ic_stethoscope" />
 
     <EditText
         android:id="@+id/editText_email"

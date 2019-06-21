@@ -3,12 +3,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".Fragments.DoctorsFragment">
+    tools:context=".Fragments.DoctorsFragment"
+    android:background="@color/fragmentBackground">
 
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Please Choose an Event"
+        android:textSize="30dp"
+        android:gravity="center"
+        android:textColor="@color/fragmentColorPrimary"
+        android:layout_marginBottom="10dp"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/events_list"
-        android:scrollbars="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scrollbars="vertical" />
+</LinearLayout>
 </RelativeLayout>

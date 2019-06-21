@@ -12,17 +12,20 @@ public class Patient {
 
     public String Device_Token;
 
+    public int Appointments;
+
     public Patient(){
         // Default constructor required for calls to DataSnapshot.getValue(Doctor.class)
     }
 
-    public Patient(String name, String surname, String age, String email, String device_Token){
+    public Patient(String name, String surname, String age, String email, String device_Token, int appointments){
 
         this.Name = name;
         this.Surname = surname;
         this.Age = age;
         this.Email = email;
         this.Device_Token = device_Token;
+        this.Appointments = appointments;
     }
 
 }

@@ -78,7 +78,8 @@ public class ProfileActivity extends AppCompatActivity {
                         name.setText(doctor.Name + " " + doctor.Surname);
                         identity.setText("Doctor");
                         mail.setText(doctor.Email);
-                        setDoctorsTextViews(data.getKey());
+
+                        setDoctorsTextViews(data.getKey().toString());
                     }
 
                     //Check if user is verified email address, if not click to verify
@@ -111,11 +112,13 @@ public class ProfileActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     Patient patient = data.getValue(Patient.class);
-
                     if (patient.Email.equals(email)) {
+                        ratingTextView.setVisibility(View.INVISIBLE);
+                        ratingTitle.setVisibility(View.INVISIBLE);
                         name.setText(patient.Name + " " + patient.Surname);
                         identity.setText("Patient");
                         mail.setText(patient.Email);
+                        appointments.setText(String.valueOf(patient.Appointments));
                     }
 
                     //Check if user is verified email address, if not click to verify
@@ -147,6 +150,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void setDoctorsTextViews(final String id) {
 
+        ratingTextView.setVisibility(View.VISIBLE);
+        ratingTitle.setVisibility(View.VISIBLE);
         ratingTitle.setText("Rating");
         mDoctorsReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -199,7 +204,7 @@ public class ProfileActivity extends AppCompatActivity {
                     });
                 }
                 else {
-                    ratingTextView.setText(0);
+                    ratingTextView.setText(String.valueOf(0));
                 }
             }
 

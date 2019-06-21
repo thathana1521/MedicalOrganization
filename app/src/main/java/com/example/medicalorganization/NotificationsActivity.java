@@ -195,6 +195,7 @@ public class NotificationsActivity extends AppCompatActivity {
                 addDoctorOnPatient(panel.patientId);
                 makeNotificationAccepted(notificationId);
                 addAppointmentOnDoctor();
+                addAppointmentOnPatient(panel.patientId);
                 makeEventAccepted(panel.eventId);
                 dialog.dismiss();
             }
@@ -211,6 +212,32 @@ public class NotificationsActivity extends AppCompatActivity {
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
 
+    }
+
+    private void addAppointmentOnPatient(final String patientId) {
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
+                .child("Patients");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot data : dataSnapshot.getChildren()){
+
+                    Patient patient = data.getValue(Patient.class);
+                    if(patient.Email.equals(mAuth.getCurrentUser().getEmail())){
+                        int appointments = patient.Appointments;
+                        appointments= appointments+1;
+
+                        DatabaseReference appRef = ref.child(patientId).child("Appointments");
+                        appRef.setValue(appointments);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void makeEventAccepted(String eventId) {

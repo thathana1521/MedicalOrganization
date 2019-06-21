@@ -26,7 +26,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_insert_emoticon_black_24dp"/>
+                app:srcCompat="@drawable/ic_users"/>
             <TextView
                 android:layout_marginTop="10dp"
                 android:layout_gravity="center_horizontal"

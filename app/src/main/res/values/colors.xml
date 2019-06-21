@@ -48,10 +48,13 @@
     <color name="alertColorAccent">#FF4081</color>
 
     //Fragments Colors
-    <color name="fragmentColorPrimary">#393939</color>
-    <color name="fragmentColorPrimaryDark">#2f2f2f</color>
+    <color name="fragmentColorPrimary">#808080</color>
+    <color name="fragmentColorPrimaryDark">#696969</color>
     <color name="fragmentColorAccent">#52b7f8</color>
-    <color name="fragmentBackground">#2b2b2b</color>
+    <color name="fragmentBackground">#5C5858</color>
+    <color name="grey">#778899</color>
+
+
 
 
 </resources>

@@ -141,7 +141,7 @@ public class RegisterActivity extends AppCompatActivity {
                             }
                             else {
                                 //if Patient
-                                Patient patient = new Patient(str_name, str_surname, str_age, str_email, token[0]);
+                                Patient patient = new Patient(str_name, str_surname, str_age, str_email, token[0], 0);
                                 FirebaseDatabase.getInstance().getReference("Patients")
                                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(patient).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override

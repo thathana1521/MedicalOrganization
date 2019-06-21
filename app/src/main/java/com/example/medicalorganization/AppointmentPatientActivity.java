@@ -46,6 +46,8 @@ public class AppointmentPatientActivity extends AppCompatActivity {
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_appointment);
         tabLayout.getTabAt(2).setIcon(R.drawable.ic_star);
 
+
+
         //Remove shadow from action bar
         AppCompatActivity activity;
         ActionBar actionBar = getSupportActionBar();
