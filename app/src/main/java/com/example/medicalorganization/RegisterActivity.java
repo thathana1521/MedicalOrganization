@@ -28,7 +28,7 @@ import java.util.List;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText name, surname, age, password, email;
+    private EditText name, surname, age, password, email, phone;
 
     private ProgressBar progressBar;
     private CheckBox identity_doctor, identity_patient;
@@ -46,6 +46,7 @@ public class RegisterActivity extends AppCompatActivity {
         surname = (EditText)findViewById(R.id.editText_surname);
         age = (EditText)findViewById(R.id.editText_age);
         email =(EditText)findViewById(R.id.editText_email);
+        phone = (EditText)findViewById(R.id.editText_phone);
         password = (EditText)findViewById(R.id.editText_password);
         identity_doctor = (CheckBox)findViewById(R.id.checkBox_doctor);
         identity_patient = (CheckBox)findViewById(R.id.checkBox_patient);
@@ -85,6 +86,7 @@ public class RegisterActivity extends AppCompatActivity {
         final String str_age = age.getText().toString();
         final String str_email =email.getText().toString().trim();
         final String str_password = password.getText().toString().trim();
+        final String str_phone = phone.getText().toString().trim();
 
         final String token[] = new String[1];
 
@@ -113,8 +115,10 @@ public class RegisterActivity extends AppCompatActivity {
                             if(identityId == 1){
 
                                 //if doctor
-
-                                Doctor doctor = new Doctor(str_name, str_surname, str_age, str_email, token[0], 0);
+                                Doctor doctor = new Doctor(str_name, str_surname,
+                                        str_age, str_email,
+                                        str_phone, token[0],
+                                        0);
                                 FirebaseDatabase.getInstance().getReference("Doctors")
                                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(doctor).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
@@ -141,7 +145,10 @@ public class RegisterActivity extends AppCompatActivity {
                             }
                             else {
                                 //if Patient
-                                Patient patient = new Patient(str_name, str_surname, str_age, str_email, token[0], 0);
+                                Patient patient = new Patient(str_name,
+                                        str_surname, str_age,
+                                        str_email, str_phone,
+                                        token[0], 0);
                                 FirebaseDatabase.getInstance().getReference("Patients")
                                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(patient).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override

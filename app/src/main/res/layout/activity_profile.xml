@@ -63,7 +63,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/rantevouTextView"
-                        android:text="125"
+                        android:text="0"
                         android:textStyle="bold"
                         android:textSize="20dp"
                         android:paddingTop="10dp"
@@ -84,7 +84,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/identityTextView"
-                        android:text="125"
+                        android:text="0"
                         android:textStyle="bold"
                         android:textSize="20dp"
                         android:paddingTop="10dp"
@@ -100,13 +100,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/ratingTitle"
-                        android:text="Δεν ξερω"
-                        android:textSize="20dp"/>
+                        android:text="Rating"
+                        android:textSize="18dp"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/ratingTextView"
-                        android:text="125"
+                        android:text="0"
                         android:textStyle="bold"
                         android:textSize="20dp"
                         android:paddingTop="10dp"
@@ -152,6 +152,7 @@
                 android:layout_height="36dp"
                 app:srcCompat="@drawable/ic_smartphone_black_24dp"/>
             <TextView
+                android:id="@+id/phoneTextView"
                 android:layout_gravity="center_vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -177,5 +178,12 @@
                 android:text="Verified"/>
 
         </LinearLayout>
+        <ProgressBar
+            android:id="@+id/progressbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true" />
     </LinearLayout>
 </LinearLayout>

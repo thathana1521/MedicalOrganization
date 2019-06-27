@@ -25,8 +25,5 @@
     <string name="email">Email</string>
 
     <string name="popup_text_default">Accept or Reject the Appointment</string>
-    <string name="popup_title_default">YEah</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".SetEventActivity"></activity>
+        <activity android:name=".ManageAppointmentsActivity"></activity>
+        <activity android:name=".SetEventActivity" />
         <activity android:name=".NotificationsActivity" />
         <activity android:name=".PatientActivity" />
         <activity android:name=".AvailableEvents" />

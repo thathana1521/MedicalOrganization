@@ -85,4 +85,8 @@ public class DoctorActivity extends AppCompatActivity {
     public void openNotificationsActivity(View view) {
         startActivity(new Intent(this, NotificationsActivity.class));
     }
+
+    public void openManageAppoinmentsActivity(View view) {
+        startActivity(new Intent(this, ManageAppointmentsActivity.class));
+    }
 }

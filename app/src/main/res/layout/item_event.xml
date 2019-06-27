@@ -34,7 +34,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/doctor_name"
+            android:id="@+id/name"
             android:textColor="@color/grey"
             android:textSize="16sp"
             android:textStyle="bold" />

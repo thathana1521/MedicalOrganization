@@ -1,7 +1,6 @@
 package com.example.medicalorganization.Fragments;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -10,18 +9,15 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.medicalorganization.AvailableEvents;
 import com.example.medicalorganization.Models.Doctor;
 import com.example.medicalorganization.Models.Patient;
 import com.example.medicalorganization.Models.Rating;
@@ -36,8 +32,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-
 public class RateFragment extends Fragment {
 
     private View doctorsView;
@@ -49,9 +43,6 @@ public class RateFragment extends Fragment {
     private Button sendFeedbackBtn;
     public ImageView closePopup;
     public final String[] doctorId = {null};
-
-
-
     private DatabaseReference DoctorsRef, PatientsRef;
 
     public RateFragment() {
@@ -245,7 +236,6 @@ public class RateFragment extends Fragment {
         });
 
     }
-
 
     public static class DoctorsViewHolder extends RecyclerView.ViewHolder {
 

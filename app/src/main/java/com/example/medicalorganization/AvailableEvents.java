@@ -125,7 +125,6 @@ public class AvailableEvents extends AppCompatActivity {
                                         String startingTime = model.startTime.getHours() + ":" + model.startTime.getMinutes();
                                         String endingTime = model.endTime.getHours() + ":" + model.endTime.getMinutes();
                                         final String eventId = getRef(position).getKey();
-
                                         holder.setDate(date);
                                         holder.setHour(startingTime + " - " + endingTime);
 
@@ -142,18 +141,19 @@ public class AvailableEvents extends AppCompatActivity {
                                                     @Override
                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                         for(DataSnapshot data: dataSnapshot.getChildren()){
-                                                            Patient patient = data.getValue(Patient.class);
+                                                            final Patient patient = data.getValue(Patient.class);
                                                             if(patient.Email.equals(user.getEmail())){
                                                                 patientToken = patient.Device_Token;
                                                                 setPatientName(patient.Name + " " + patient.Surname);
                                                             }
                                                             Api api = retrofit.create(Api.class);
-                                                            Call<ResponseBody> call = api.sendNotification(doctorToken, "New appointment request", patientName + " have requested an appointment for " + model.date.getDate());
+                                                            Call<ResponseBody> call = api.sendNotification(doctorToken, "New appointment request", patientName + " has requested an appointment for " + model.date.getDate());
 
                                                             call.enqueue(new Callback<ResponseBody>() {
                                                                 @Override
                                                                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                                                                     setNotification(patientName, model, eventId, received_user_id, patientToken, patientId);
+                                                                    setPatientCredentialsOnEvent(received_user_id, eventId, patient.Name + " " + patient.Surname, patientToken);
                                                                     Toast.makeText(getApplicationContext(),"Notification sent to the Doctor", Toast.LENGTH_LONG).show();
 
                                                                 }
@@ -171,7 +171,7 @@ public class AvailableEvents extends AppCompatActivity {
 
                                                     }
                                                 });
-                                                Toast.makeText(getApplicationContext(), patientName, Toast.LENGTH_LONG).show();
+
                                             }
                                         });
 
@@ -213,6 +213,23 @@ public class AvailableEvents extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void setPatientCredentialsOnEvent(String doctorId, String eventId, String patientName, String patientToken) {
+        FirebaseDatabase.getInstance().getReference("Doctors")
+                .child(doctorId)
+                .child("Events")
+                .child(eventId)
+                .child("patientName")
+                .setValue(patientName);
+
+        FirebaseDatabase.getInstance().getReference("Doctors")
+                .child(doctorId)
+                .child("Events")
+                .child(eventId)
+                .child("patientToken")
+                .setValue(patientToken);
+
     }
 
     private void setNotification(String name, Event event, String eventId, String doctorID, String patientToken, String patientId) {

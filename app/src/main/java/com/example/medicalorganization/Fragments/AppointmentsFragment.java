@@ -136,7 +136,7 @@ public class AppointmentsFragment extends Fragment {
         }
 
         public void setDoctorName(String name) {
-            doctorName = (TextView) mView.findViewById(R.id.doctor_name);
+            doctorName = (TextView) mView.findViewById(R.id.name);
             doctorName.setText(name);
         }
     }

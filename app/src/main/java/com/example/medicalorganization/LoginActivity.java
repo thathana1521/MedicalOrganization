@@ -61,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
                     final String[] token = new String[1];
                     //GET REGISTRATION TOKEN
                     FirebaseInstanceId.getInstance().getInstanceId()
-                            .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                    .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<InstanceIdResult> task) {
                                     if(task.isSuccessful()){

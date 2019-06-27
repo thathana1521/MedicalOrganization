@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +39,9 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFireDatabase;
     private DatabaseReference mDoctorsReference, mPatientReference;
-    private TextView name, identity, mail, verifiedEmail, appointments, ratingTextView, ratingTitle;
+    private TextView name, identity, mail, verifiedEmail, appointments, ratingTextView, ratingTitle, phone;
+
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +51,14 @@ public class ProfileActivity extends AppCompatActivity {
         name = (TextView) findViewById(R.id.nameTextView);
         identity = (TextView) findViewById(R.id.identityTextView);
         mail = (TextView) findViewById(R.id.mailTextView);
+        phone = (TextView)findViewById(R.id.phoneTextView);
         verifiedEmail = (TextView) findViewById(R.id.verifiedEmail);
         appointments = (TextView)findViewById(R.id.rantevouTextView);
         ratingTextView = (TextView)findViewById(R.id.ratingTextView);
         ratingTitle = (TextView)findViewById(R.id.ratingTitle);
+
+        progressBar = (ProgressBar)findViewById(R.id.progressbar);
+        progressBar.setVisibility(View.GONE);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -64,7 +71,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void loadUserInformation() {
-
+        progressBar.setVisibility(View.VISIBLE);
         final String email = mAuth.getCurrentUser().getEmail();
         Log.e("CHECK",email);
         mDoctorsReference.addValueEventListener(new ValueEventListener() {
@@ -78,8 +85,10 @@ public class ProfileActivity extends AppCompatActivity {
                         name.setText(doctor.Name + " " + doctor.Surname);
                         identity.setText("Doctor");
                         mail.setText(doctor.Email);
+                        phone.setText(doctor.Phone);
 
                         setDoctorsTextViews(data.getKey().toString());
+
                     }
 
                     //Check if user is verified email address, if not click to verify
@@ -99,6 +108,7 @@ public class ProfileActivity extends AppCompatActivity {
                             }
                         });
                     }
+                    progressBar.setVisibility(View.GONE);
                 }
             }
 
@@ -118,6 +128,7 @@ public class ProfileActivity extends AppCompatActivity {
                         name.setText(patient.Name + " " + patient.Surname);
                         identity.setText("Patient");
                         mail.setText(patient.Email);
+                        phone.setText(patient.Phone);
                         appointments.setText(String.valueOf(patient.Appointments));
                     }
 
@@ -138,6 +149,7 @@ public class ProfileActivity extends AppCompatActivity {
                             }
                         });
                     }
+                    progressBar.setVisibility(View.GONE);
                 }
             }
 
@@ -204,7 +216,7 @@ public class ProfileActivity extends AppCompatActivity {
                     });
                 }
                 else {
-                    ratingTextView.setText(String.valueOf(0));
+                    ratingTextView.setText("No ratings yet");
                 }
             }
 

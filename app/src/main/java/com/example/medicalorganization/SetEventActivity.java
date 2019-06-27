@@ -3,15 +3,19 @@ package com.example.medicalorganization;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.medicalorganization.Models.Event;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -31,6 +35,8 @@ public class SetEventActivity extends AppCompatActivity implements TimePickerFra
     private FirebaseAuth mAuth;
     private DatabaseReference mEventsDatabaseReference;
 
+    private ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +45,9 @@ public class SetEventActivity extends AppCompatActivity implements TimePickerFra
         btnSetDate = (Button)findViewById(R.id.btnSetDate);
         btnSetStHour = (Button)findViewById(R.id.btnSetStHour);
         btnSetEndHour = (Button)findViewById(R.id.btnSetEndHour);
+
+        progressBar = (ProgressBar)findViewById(R.id.progressbar);
+        progressBar.setVisibility(View.GONE);
 
         mFireDatabase = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
@@ -66,20 +75,18 @@ public class SetEventActivity extends AppCompatActivity implements TimePickerFra
     public void createEvent(View view) {
         String doctorName = mAuth.getCurrentUser().getDisplayName();
 
-        if (startTime != null && endTime != null) {
-            Toast.makeText(getApplicationContext(), "start hour: " + startTime.getHours() + startTime.getMinutes(), Toast.LENGTH_LONG).show();
-            Toast.makeText(getApplicationContext(), "end hour: " + endTime.getHours()+ endTime.getMinutes(), Toast.LENGTH_LONG).show();
-        } else {
+        if (startTime == null || endTime == null) {
             Toast.makeText(getApplicationContext(), "Start Time or End Time is not set!", Toast.LENGTH_LONG).show();
+        } else {
+            Event event = new Event(date, startTime, endTime, doctorName, "No Patient choosed this event",null, null, mAuth.getCurrentUser().getUid(), false );
+            if (event==null){
+                Toast.makeText(getApplicationContext(),"Something went wrong with the creation of event.", Toast.LENGTH_LONG).show();
+            }
+            else {
+                addEventToDatabase(event);
+            }
         }
-        Event event = new Event(date, startTime, endTime, doctorName, "No Patient choosed this event", mAuth.getCurrentUser().getUid(), false );
-        if (event==null){
-            Toast.makeText(getApplicationContext(),"Something went wrong with the creation of event.", Toast.LENGTH_LONG).show();
-        }
-        else {
-            Toast.makeText(getApplicationContext(),"Event Created with date:"+event.date.toString()+" startTime: "+event.startTime.toString()+" endTime: "+event.endTime.toString(), Toast.LENGTH_LONG).show();
-            addEventToDatabase(event);
-        }
+
     }
 
     public void showTimePickerDialog(View view) {
@@ -99,7 +106,16 @@ public class SetEventActivity extends AppCompatActivity implements TimePickerFra
         }
     }
     public void addEventToDatabase(Event event){
-        mEventsDatabaseReference.push().setValue(event);
+        progressBar.setVisibility(View.VISIBLE);
+        mEventsDatabaseReference.push().setValue(event).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()){
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(getApplicationContext(),"Event Created Successfully", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
 
